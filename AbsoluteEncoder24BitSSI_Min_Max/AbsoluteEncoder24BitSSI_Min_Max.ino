@@ -1,6 +1,10 @@
 const int CLOCK_PIN = 5;
 const int DATA_PIN = 6;
 const int BIT_COUNT = 24;
+ 
+unsigned long diffb;
+unsigned long diffmin = 13000000;
+unsigned long diffmax;
 
 void setup() {
   //setup our pins
@@ -16,14 +20,32 @@ void setup() {
 
 void loop() {
   unsigned long reading = readPosition();
+
+  //min
+  //1000
+  diffb = reading;
+    //1000>0
+  if(diffb > diffmax ) {
+    diffmax = diffb;
+    
+  }
+  if (diffb<diffmin) {
+     diffmin=diffb;
+  }
+  
   Serial.print("Reading:");
-  Serial.println(reading);
+  Serial.print(reading);
+  Serial.print("Min:");
+  Serial.print(diffmin);
+  Serial.print("Max:");
+  Serial.println(diffmax);
 
-
-  delay(100);
+//  delay(100);
 }
 
 //read the current angular position
+
+
 unsigned long readPosition() {
   unsigned long sample1 = shiftIn(DATA_PIN, CLOCK_PIN, BIT_COUNT);
   return sample1;
