@@ -2,6 +2,17 @@ const int CLOCK_PIN = 5;
 const int DATA_PIN = 6;
 const int BIT_COUNT = 24;
 
+unsigned long last_time;
+long displayDelay = 500;
+
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define OLED_RESET     -1 
+#define SCREEN_ADDRESS 0x3C 
+Adafruit_SSD1306 display(OLED_RESET);
+
 void setup() {
   //setup our pins
   pinMode(DATA_PIN, INPUT);
@@ -10,7 +21,10 @@ void setup() {
   //give some default values
   digitalWrite(CLOCK_PIN, HIGH);
 
-  Serial.begin(19200);
+  Wire.begin();
+  display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS); 
+  Serial.begin(115200);
+
 }
 
 
@@ -19,8 +33,11 @@ void loop() {
   Serial.print("$");
   Serial.print(reading);
   Serial.println(";");
-
-  delay(100);
+  if (millis()- last_time > displayDelay){
+    last_time = millis();
+    displayPrint(reading);
+    display.display();
+  }
 }
 
 //read the current angular position
@@ -45,3 +62,17 @@ unsigned long shiftIn(const int data_pin, const int clock_pin, const int bit_cou
 
   return data;
 }
+
+void displayPrint(unsigned long displayValue){
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.print("Result:");
+  display.setTextSize(2);
+  display.setCursor(0, 8);
+  display.print(displayValue);
+}
+
+
+
