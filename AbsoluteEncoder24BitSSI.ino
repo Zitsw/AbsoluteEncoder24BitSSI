@@ -16,8 +16,9 @@ void setup() {
 
 void loop() {
   unsigned long reading = readPosition();
-  Serial.print("Reading:");
-  Serial.println(reading);
+  Serial.print("$");
+  Serial.print(reading);
+  Serial.println(";");
 
   delay(100);
 }
