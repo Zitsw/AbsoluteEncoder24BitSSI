@@ -2,12 +2,22 @@ const int CLOCK_PIN = 5;
 const int DATA_PIN = 6;
 const int BIT_COUNT = 24;
 
+
+const float formula2 = 0.0000153547881599881;
+const long formula1 = 8000000;
+
+
+unsigned long result2;
+float result3;
+
+
 unsigned long last_time;
 long displayDelay = 500;
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+
 
 #define OLED_RESET     -1 
 #define SCREEN_ADDRESS 0x3C 
@@ -23,19 +33,21 @@ void setup() {
 
   Wire.begin();
   display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS); 
-  Serial.begin(115200);
+  Serial.begin(9600);
 
 }
 
 
 void loop() {
   unsigned long reading = readPosition();
-  Serial.print("$");
-  Serial.print(reading);
-  Serial.println(";");
+  result2 = reading - formula1;
+  result3 = result2 * formula2;
+ // Serial.print("$");
+  Serial.println(result3,8);
+ // Serial.println(";");
   if (millis()- last_time > displayDelay){
     last_time = millis();
-    displayPrint(reading);
+    displayPrint(result3);
     display.display();
   }
 }
@@ -72,6 +84,7 @@ void displayPrint(unsigned long displayValue){
   display.setTextSize(2);
   display.setCursor(0, 8);
   display.print(displayValue);
+
 }
 
 
