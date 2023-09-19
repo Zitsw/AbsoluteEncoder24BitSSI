@@ -1,18 +1,18 @@
-const int CLOCK_PIN = 5;
-const int DATA_PIN = 6;
-const int BIT_COUNT = 24;
+const int CLOCK_PIN {5} ;
+const int DATA_PIN {6} ;
+const int BIT_COUNT {24}} ;
 
 
-const float formula2 = 0.0000153547881599881;
-const long formula1 = 8000000;
+const float formula2  {0.0000153547881599881};
+const long formula1  {8000000};
 
 
-unsigned long result2;
-float result3;
+unsigned long result2 {};
+float result3 {};
 
 
-unsigned long last_time;
-long displayDelay = 500;
+unsigned long last_time {};
+long displayDelay {500};
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -33,7 +33,7 @@ void setup() {
 
   Wire.begin();
   display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS); 
-  Serial.begin(38400);
+  Serial.begin(9600);
 
 }
 
