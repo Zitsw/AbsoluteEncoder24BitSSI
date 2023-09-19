@@ -37,7 +37,7 @@ void setup() {
 
   Wire.begin();
   //display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS); 
-  Serial.begin(9600);
+  Serial.begin(115200);
 
 }
 
@@ -46,7 +46,7 @@ void loop() {
   result2 = reading - formula1;
   result3 = result2 * formula2;
   Serial.print("$");
-  Serial.print(result3,4);
+  Serial.print(result3, 6);
   Serial.println(";");
  // if (millis()- last_time > displayDelay){
    // last_time = millis();
@@ -69,9 +69,9 @@ unsigned long shiftIn(const int data_pin, const int clock_pin, const int bit_cou
   for (int i=0; i<bit_count; i++) {
     data <<= 1;
     digitalWrite(clock_pin, LOW);
-    delayMicroseconds(1);
+    delayMicroseconds(9);
     digitalWrite(clock_pin, HIGH);
-    delayMicroseconds(1);
+    delayMicroseconds(9);
 
     data |= digitalRead(data_pin);
     //Serial.println(data);
