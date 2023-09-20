@@ -1,27 +1,26 @@
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <SD.h>
+
 const int CLOCK_PIN  {25};
 const int DATA_PIN  {26};
 const int BIT_COUNT  {24};
-
+const int SD_PIN {5};
 
 const float formula2  {0.0000153547881599881};
 const long formula1  {8000000};
-
-
 unsigned long result2 {};
 float result3 {};
-
 
 unsigned long last_time {};
 //long displayDelay  {500};
 
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-
-
 ///#define OLED_RESET     -1 
 //#define SCREEN_ADDRESS 0x3C 
 //Adafruit_SSD1306 display(OLED_RESET);
+File myFile;
 
 unsigned long readPosition();
 unsigned long shiftIn(const int data_pin, const int clock_pin, const int bit_count);
@@ -36,8 +35,14 @@ void setup() {
   digitalWrite(CLOCK_PIN, HIGH);
 
   Wire.begin();
+  SD.begin(SD_PIN);
   //display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS); 
   Serial.begin(115200);
+  myFile = SD.open("File.csv", FILE_WRITE);
+  if(myFile){
+    myFile.print("Date");
+  }
+  myFile.close();
 
 }
 
