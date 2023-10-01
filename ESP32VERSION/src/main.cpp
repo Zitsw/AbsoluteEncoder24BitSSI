@@ -1,13 +1,15 @@
+#include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+// #include <Adafruit_GFX.h>
+// #include <Adafruit_SSD1306.h>
 #include <SD.h>
+#include <FreeRTOSConfig.h>
 
 const int CLOCK_PIN  {25};
 const int DATA_PIN  {26};
 const int BIT_COUNT  {24};
-const int SD_PIN {5};
+const int SD_PIN {22};
 
 const float formula2  {0.0000153547881599881};
 const long formula1  {8000000};
