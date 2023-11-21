@@ -3,31 +3,43 @@
 #include <SPI.h>
 #include "FS.h"
 #include <SD.h>
+#include <RTClib.h>
 // #include <Adafruit_GFX.h>
 // #include <Adafruit_SSD1306.h>
 #include <FreeRTOSConfig.h>
-
+//Pins
 const int CLOCK_PIN  {25};
 const int DATA_PIN  {26};
 const int BIT_COUNT  {24};
 const int SD_PIN {22};
-
+const int BUTTON_PIN {21};
+const int LED_PIN {32};
+// Math
 const float formula2  {0.0000153547881599881};
 const long formula1  {8000000};
 unsigned long result2 {};
 float result3 {};
-
+//Time
 int timing {12};
 int Btime {0};
 int timer_count[4] = {0, 0, 0, 0};
 unsigned long last_time {};
-long programDelay  {5000};
+long programDelay {20};
+//Button
+boolean DynamicMode = false;
+unsigned long lastDebounceTime {0};
+int buttonState;
+long DEBOUNCE_TIME {50};
+int lastButtonState = LOW;  // the previous reading from the input pin
 
 ///#define OLED_RESET     -1 
 //#define SCREEN_ADDRESS 0x3C 
 //Adafruit_SSD1306 display(OLED_RESET);
+//Initialization
+String titleDataMessage;
 String dataMessage;
 File myFile;
+RTC_DS3231 rtc;
 void appendFile(fs::FS &fs, const char * path, const char * message);
 unsigned long readPosition();
 unsigned long shiftIn(const int data_pin, const int clock_pin, const int bit_count);
@@ -37,6 +49,8 @@ void setup() {
   //setup our pins
   pinMode(DATA_PIN, INPUT);
   pinMode(CLOCK_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
 
   //give some default values
   digitalWrite(CLOCK_PIN, HIGH);
@@ -44,44 +58,72 @@ void setup() {
   Wire.begin();
   
   // SD card init
-  if(SD.begin(SD_PIN)){
+  if(SD.begin(SD_PIN,SPI,40000000)){
     Serial.print("SD is ready for use");
   }else{
     Serial.print("Check SD card connetion");
   }
+  createDir(SD, "/DAT");
   //display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS); 
-
+  titleDataMessage = "Время;Дата;ID Регистратора;Версия ПО;Канал;Тип\n10.02.2023;4:58:14;100;03.00;01;06\n";
+  appendFile(SD, "/mySCV.txt", titleDataMessage.c_str());
 }
 
 void loop() {
-   unsigned long reading = readPosition();
-   result2 = reading - formula1;
-   result3 = result2 * formula2;
-   if (millis() - timing >= 1000){
-    timer_count[0]++; //sec
-    Serial.println("Atime in first if before reset: " + String(timing));
-    timing = millis();
-    Serial.println("Atime in first if after reset: " + String(timing));
-    Serial.println("array[0]: in first if " + String(timer_count[0]));
-   }
-    if (timer_count[0] == 60){ //min
-      timer_count[1]++;
-      Serial.println("min array : " + String(timer_count[1]));
-      timer_count[0] = 0;
-      Serial.println("sec array should be 0: " + String(timer_count[0]));
-    }
-      if(timer_count[1] == 60){
-        timer_count[2]++;
-        timer_count[1] = 0;
+  //Button Reading
+  int ButtonReading = digitalRead(BUTTON_PIN);
+  if (ButtonReading != lastButtonState) {
+    lastDebounceTime = millis();
+  }
+    if ((millis() - lastDebounceTime) > DEBOUNCE_TIME) {
+    if (ButtonReading != buttonState) {
+      buttonState = ButtonReading;
+      if (buttonState == HIGH) {
+        DynamicMode = !DynamicMode;
       }
-        if(timer_count[2] == 24){
-          timer_count[3]++;
-          timer_count[2] = 0;
-        }
-  String getTime = String(timer_count[3]) + "-" + String(timer_count[2]) + "-" + String(timer_count[1]) + "-" + String(timer_count[0]);
-  dataMessage = getTime + ";" + String(result3, 6) + "\n";
-  appendFile(SD, "/mySCV.txt", dataMessage.c_str());
-//  delay(5000);
+    }
+  }
+  lastButtonState = ButtonReading;
+//math
+  unsigned long reading = readPosition();
+  result2 = reading - formula1;
+  result3 = result2 * formula2;
+  // if (millis() - timing >= 1000){
+  //   timer_count[0]++; //sec
+  //   timing = millis();
+  // }
+  //   if (timer_count[0] == 60){ //min
+  //     timer_count[1]++;
+  //     timer_count[0] = 0;
+  //   }
+  //     if(timer_count[1] == 60){
+  //       timer_count[2]++;
+  //       timer_count[1] = 0;
+  //     }
+  //       if(timer_count[2] == 24){
+  //         timer_count[3]++;
+  //         timer_count[2] = 0;
+  //       }
+  dataMessage = String(result3, 6) + ";" + "\n";
+
+  if (DynamicMode == false){
+    programDelay = 5000;
+    digitalWrite(LED_PIN, LOW);
+    if (millis()- last_time > programDelay){
+    last_time = millis();
+    appendFile(SD, "/mySCV.txt", dataMessage.c_str());
+    }
+  }
+
+  if (DynamicMode == true){
+    programDelay = 20;
+    digitalWrite(LED_PIN, HIGH);
+  }
+ // String getTime = String(timer_count[3]) + "-" + String(timer_count[2]) + "-" + String(timer_count[1]) + "-" + String(timer_count[0]);
+  
+  //dataMessage = String(result3, 6) + ";\n";
+  //Check if button was pressed
+//  delay(1500);
   // if (millis()- last_time > programDelay){
   //   last_time = millis();
   //   Serial.print("$");
@@ -134,6 +176,14 @@ void appendFile(fs::FS &fs, const char * path, const char * message){
   file.close();
 }
 
+void createDir(fs::FS &fs, const char * path){
+  Serial.printf("Creating Dir: %s\n", path);
+  if(fs.mkdir(path)){
+    Serial.println("Dir created");
+  } else {
+    Serial.println("mkdir failed");
+  }
+}
 
 
 
