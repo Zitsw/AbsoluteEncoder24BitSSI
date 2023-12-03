@@ -27,10 +27,11 @@ unsigned long last_time {};
 long programDelay {};
 int convertYear {};
 String convertMinute {};
+String convertSecond{};
 int lastHour{};
 int lastMinute{};
 //Button
-boolean DynamicMode = 0;
+boolean DynamicMode;
 unsigned long lastDebounceTime {0};
 int buttonState;
 long DEBOUNCE_TIME {50};
@@ -82,6 +83,9 @@ void setup() {
   createDir(SD, "/DIN");
  
   lastMinute =now.minute();
+  lastHour = now.hour();
+  DynamicMode = false;
+
   convertYear = now.year() - 2000;
   fileNameTimeDAT = String(now.hour()) + String(now.day())  + String(now.month()) + String(convertYear);
   title = "Date;Time;ID;FW version;Channel;Mode;Value; \n";
@@ -106,19 +110,20 @@ void loop() {
     }
   }
   lastButtonState = ButtonReading;
-// //math
-   unsigned long reading = readPosition();
-   result2 = reading - formula1;
-   result3 = result2 * formula2;
-
-//   dataMessage = String(result3, 6) + ";" + "\n"
-  int testHOUR = now.hour();
-  int testMIN = now.minute();
- // Serial.println(testHOUR);
-  Serial.println(fileNameDAT);
-
-  
-  
+// //math 
+  unsigned long reading = readPosition();
+  result2 = reading - formula1;
+  result3 = result2 * formula2;
+  if(now.second()<10){
+    convertSecond = "0" + String(now.second());
+  }else{
+    convertSecond = String(now.second());
+  }
+  if(now.minute()<10){
+    convertMinute = "0" + String(now.minute());
+  }else{
+    convertMinute = String(now.minute());
+  }
   if (DynamicMode == false){  
   programDelay = 10000;
   digitalWrite(LED_PIN, LOW);
@@ -128,49 +133,34 @@ void loop() {
     fileNameDAT = "/DAT/" + fileNameTimeDAT + ".csv";
     appendFile(SD, fileNameDAT.c_str(), title.c_str());
   }
-  String time = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.minute());
+  String time = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(convertMinute) + ":" + String(convertSecond);
   dataMessage = time + ";100;03.00;01;V;" + String(result3, 6) + ";" + "\n";
     if (millis()- last_time > programDelay){
     last_time = millis();
-    Serial.println(time);
     appendFile(SD, fileNameDAT.c_str(), dataMessage.c_str());
     }
   }
-  
+
   if (DynamicMode == true){
   programDelay = 20;
   digitalWrite(LED_PIN, HIGH);
   if(lastMinute != now.minute()){
-    if(now.second()<10){
-    convertMinute = "0" + String(now.second());
-    }
-    fileNameTimeDIN = String(now.hour()) + String(now.minute())  + convertMinute + "01";
+    fileNameTimeDIN = String(now.hour()) + convertMinute  + convertSecond + "01";
     fileNameDIN = "/DIN/" + fileNameTimeDIN + ".csv"; 
     lastMinute = now.minute();
-    timeDIN = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(now.minute()) + ":" + convertMinute ; 
+    timeDIN = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(convertMinute) + ":" + String(convertSecond); 
     messageDIN = timeDIN + ";100;03.00;01;06" + "\n";
     appendFile(SD, fileNameDIN.c_str(), title.c_str());
     appendFile(SD, fileNameDIN.c_str(), messageDIN.c_str());
   }
-
-
   dataMessage = String(result3, 6) + ";" + "\n";
     if (millis()- last_time > programDelay){
     last_time = millis();
     appendFile(SD, fileNameDIN.c_str(), dataMessage.c_str());
     }
- // String getTime = String(timer_count[3]) + "-" + String(timer_count[2]) + "-" + String(timer_count[1]) + "-" + String(timer_count[0]);
+ 
   }
-  //dataMessage = String(result3, 6) + ";\n";
-  //Check if button was pressed
-//  delay(1500);
-  // if (millis()- last_time > programDelay){
-  //   last_time = millis();
-  //   Serial.print("$");
-  //   Serial.print(result3, 6);
-  //   Serial.println(";");
-  //   appendFile(SD, "/mySCV.txt", dataMessage.c_str());
-  // }
+
 }
 
 
