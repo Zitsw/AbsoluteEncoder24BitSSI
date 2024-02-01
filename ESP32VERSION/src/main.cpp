@@ -19,9 +19,9 @@ void setup() {
   DateTime now = rtc.now();
  
   // SD card init
-  SD.begin(SD_PIN);
-  createDir(SD, "/DAT");
-  createDir(SD, "/DIN");
+ // SD.begin(SD_PIN);
+ // createDir(SD, "/DAT");
+ // createDir(SD, "/DIN");
  
   lastMinute =now.minute();
   lastHour = now.hour();
@@ -31,7 +31,7 @@ void setup() {
   fileNameTimeDAT = String(now.hour()) + String(now.day())  + String(now.month()) + String(convertYear);
   title = "Date;Time;ID;FW version;Channel;Mode;Value; \n";
   fileNameDAT = "/DAT/" + fileNameTimeDAT + ".csv";
-  appendFile(SD,fileNameDAT.c_str(), title.c_str());
+ // appendFile(SD,fileNameDAT.c_str(), title.c_str());
 }
 
 void loop() {
@@ -55,6 +55,7 @@ void loop() {
   unsigned long reading = readPosition();
   result2 = reading - formula1;
   result3 = result2 * formula2;
+  Serial.println(result3);
   if(now.second()<10){
     convertSecond = "0" + String(now.second());
   }else{
@@ -72,13 +73,13 @@ void loop() {
     fileNameTimeDAT = String(now.hour()) + String(now.day())  + String(now.month()) + String(convertYear);
     lastHour = now.hour();
     fileNameDAT = "/DAT/" + fileNameTimeDAT + ".csv";
-    appendFile(SD, fileNameDAT.c_str(), title.c_str());
+   // appendFile(SD, fileNameDAT.c_str(), title.c_str());
   }
   String time = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(convertMinute) + ":" + String(convertSecond);
   dataMessage = time + ";100;03.00;01;V;" + String(result3, 6) + ";" + "\n";
     if (millis()- last_time > programDelay){
     last_time = millis();
-    appendFile(SD, fileNameDAT.c_str(), dataMessage.c_str());
+   // appendFile(SD, fileNameDAT.c_str(), dataMessage.c_str());
     }
   }
 
@@ -91,13 +92,13 @@ void loop() {
     lastMinute = now.minute();
     timeDIN = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(convertMinute) + ":" + String(convertSecond); 
     messageDIN = timeDIN + ";100;03.00;01;06" + "\n";
-    appendFile(SD, fileNameDIN.c_str(), title.c_str());
-    appendFile(SD, fileNameDIN.c_str(), messageDIN.c_str());
+   // appendFile(SD, fileNameDIN.c_str(), title.c_str());
+   // appendFile(SD, fileNameDIN.c_str(), messageDIN.c_str());
   }
   dataMessage = String(result3, 6) + ";" + "\n";
     if (millis()- last_time > programDelay){
     last_time = millis();
-    appendFile(SD, fileNameDIN.c_str(), dataMessage.c_str());
+   // appendFile(SD, fileNameDIN.c_str(), dataMessage.c_str());
     }
  
   }
