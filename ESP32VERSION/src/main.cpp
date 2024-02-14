@@ -3,6 +3,8 @@
 
 File myFile;
 RTC_DS3231 rtc;
+U8G2_SSD1322_NHD_256X64_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 5, /* dc=*/ 13, /* reset=*/ 12);	// Enable U8G2_16BIT in u8g2.h
+
 void setup() {
   //setup our pins
   pinMode(DATA_PIN, INPUT);
@@ -13,6 +15,7 @@ void setup() {
   //give some default values
   digitalWrite(CLOCK_PIN, HIGH);
   Serial.begin(115200);
+  u8g2.begin();  
   Wire.begin();
   rtc.begin();
   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
@@ -102,6 +105,14 @@ void loop() {
     }
  
   }
+  u8g2.firstPage();
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_ncenB14_tr);   // set font 
+  u8g2.setCursor(10,30);         
+  u8g2.print(result3);
+  u8g2.setCursor(110,35);
+  u8g2.print("SciBIM");
+  u8g2.sendBuffer();
 
 }
 

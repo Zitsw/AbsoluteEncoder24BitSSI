@@ -4,6 +4,5 @@
 #include "FS.h"
 #include <SD.h>
 #include <RTClib.h>
+#include <U8g2lib.h>
 //#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <FreeRTOSConfig.h>
