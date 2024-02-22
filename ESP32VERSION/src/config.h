@@ -5,13 +5,15 @@
 // Pins
 const int CLOCK_PIN  {25}; // RX pin
 const int DATA_PIN  {26}; //TX pin
-const int BIT_COUNT  {24}; //amount of bits encoder have 
+const int BIT_COUNT  {17}; //amount of bits encoder have 
 const int SD_PIN {14};  // pin for sd card
 const int BUTTON_PIN {33}; // pin for button
 const int LED_PIN {32}; // pin for LED
 
 // Math
-const float formula2  {0.0000153547881599881};
+const float formula2  {0.000999964};
+
+//0.0000153547881599881 - 24 bit
 const long formula1  {8000000};
 unsigned long result2 {};
 float result3 {};
