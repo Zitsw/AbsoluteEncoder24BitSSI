@@ -5,4 +5,7 @@
 #include <SD.h>
 #include <RTClib.h>
 #include <U8g2lib.h>
+#include <GyverEncoder.h>
+#include <GyverButton.h>
+ #include <FastLED.h>
 //#include <Adafruit_GFX.h>
