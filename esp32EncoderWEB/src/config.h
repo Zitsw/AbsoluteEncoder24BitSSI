@@ -73,6 +73,7 @@ unsigned long shiftIn(const int data_pin, const int clock_pin, const int bit_cou
 void createDirectories(const char* path);
 void isr(); // encoder Interrupt
 
+
 // SciBIM logo pic for display
 // 'Science Gauge', 90x40px
 const unsigned char epd_bitmap_Science_Gauge [] PROGMEM = {

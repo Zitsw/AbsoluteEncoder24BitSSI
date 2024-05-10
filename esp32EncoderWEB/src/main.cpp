@@ -1,9 +1,10 @@
 //#include <libraries.h> // Libraries defined
 #include <config.h> // all configuration values and libraries
+#include <webConfig.h>
 
 File myFile;
 RTC_DS3231 rtc;
-U8G2_SSD1322_NHD_256X64_F_4W_HW_SPI u8g2(U8G2_R0, 5,18,12);	// Enable U8G2_16BIT in u8g2.h
+U8G2_SSD1322_NHD_256X64_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 5, /* dc=*/ 13, /* reset=*/ 12);	// Enable U8G2_16BIT in u8g2.h
 Encoder enc(encoders2clock,encoders1data,encoderbutton);
 GButton ModeButton (BUTTON_PIN, HIGH_PULL, NORM_OPEN); 
 GButton ResetButton (resetBUTTON_PIN, HIGH_PULL, NORM_OPEN); 
@@ -11,6 +12,14 @@ CRGB leds[1];
 
 
 void setup() {
+  //Web
+  WiFi.softAP(ssid, password);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+  delay(100);
+  server.on("text/html", handle_encoder); 
+  server.begin();
+
+
   //setup our pins
   pinMode(progibomerDATA_PIN, INPUT);
   pinMode(progibomerCLOCK_PIN, OUTPUT);
@@ -52,25 +61,25 @@ void setup() {
 }
 
 void loop() {
+  server.handleClient();
   //time reading
   DateTime now = rtc.now();
   enc.tick();
   analogWrite(LED_PIN,200);
-
-
  //math 
   unsigned long reading = readPosition();
   // result2 = reading - formula1; 24 bit ?
   //  result3 = result2 * formula2;
   step3 = reading * formula2;
   result = step3 - zerovalue;
-  Serial.println(result);
+ // Serial.println(result3);
   if(result > maxvalue){
     maxvalue = result;
   }
   if(result < minvalue){
     minvalue = result;
   }
+
   if (ModeButton.isClick()) DynamicMode = !DynamicMode;
   if (ResetButton.isClick()) {
   zerovalue = step3 ;
