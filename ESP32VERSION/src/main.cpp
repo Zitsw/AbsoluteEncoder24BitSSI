@@ -3,7 +3,7 @@
 
 File myFile;
 RTC_DS3231 rtc;
-U8G2_SSD1322_NHD_256X64_F_4W_HW_SPI u8g2(U8G2_R0, 5,18,12);	// Enable U8G2_16BIT in u8g2.h
+U8G2_SSD1322_NHD_256X64_F_4W_HW_SPI u8g2(U8G2_R0, 5,13,12);	// Enable U8G2_16BIT in u8g2.h
 Encoder enc(encoders2clock,encoders1data,encoderbutton);
 GButton ModeButton (BUTTON_PIN, HIGH_PULL, NORM_OPEN); 
 GButton ResetButton (resetBUTTON_PIN, HIGH_PULL, NORM_OPEN); 
@@ -113,52 +113,52 @@ void loop() {
       FastLED.show();
     }
   
-  // if(now.second()<10){
-  //   convertSecond = "0" + String(now.second());
-  // }else{
-  //   convertSecond = String(now.second());
-  // }
-  // if(now.minute()<10){
-  //   convertMinute = "0" + String(now.minute());
-  // }else{
-  //   convertMinute = String(now.minute());
-  // }
-  // if (DynamicMode == false){  
-  // programDelay = 10000;
-  // digitalWrite(LED_PIN, LOW);
-  // if(lastHour != now.hour()){
-  //   fileNameTimeDAT = String(now.hour()) + String(now.day())  + String(now.month()) + String(convertYear);
-  //   lastHour = now.hour();
-  //   fileNameDAT = "/DAT/" + fileNameTimeDAT + ".csv";
-  //   appendFile(SD, fileNameDAT.c_str(), title.c_str());
-  // }
-  // String time = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(convertMinute) + ":" + String(convertSecond);
-  // dataMessage = time + ";100;03.00;01;V;" + String(result3, 6) + ";" + "\n";
-  //   if (millis()- last_time > programDelay){
-  //   last_time = millis();
-  //   appendFile(SD, fileNameDAT.c_str(), dataMessage.c_str());
-  //   }
-  // }
+  if(now.second()<10){
+    convertSecond = "0" + String(now.second());
+  }else{
+    convertSecond = String(now.second());
+  }
+  if(now.minute()<10){
+    convertMinute = "0" + String(now.minute());
+  }else{
+    convertMinute = String(now.minute());
+  }
+  if (DynamicMode == false){  
+  programDelay = 10000;
+  digitalWrite(LED_PIN, LOW);
+  if(lastHour != now.hour()){
+    fileNameTimeDAT = String(now.hour()) + String(now.day())  + String(now.month()) + String(convertYear);
+    lastHour = now.hour();
+    fileNameDAT = "/DAT/" + fileNameTimeDAT + ".csv";
+    appendFile(SD, fileNameDAT.c_str(), title.c_str());
+  }
+  String time = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(convertMinute) + ":" + String(convertSecond);
+  dataMessage = time + ";100;03.00;01;V;" + String(result, 6) + ";" + "\n";
+    if (millis()- last_time > programDelay){
+    last_time = millis();
+    appendFile(SD, fileNameDAT.c_str(), dataMessage.c_str());
+    }
+  }
 
-  //  if (DynamicMode == true){
-  // programDelay = 20;
-  // digitalWrite(LED_PIN, HIGH);
-  // if(lastMinute != now.minute()){
-  //   fileNameTimeDIN = String(now.hour()) + convertMinute  + convertSecond + "01";
-  //   fileNameDIN = "/DIN/" + fileNameTimeDIN + ".csv"; 
-  //   lastMinute = now.minute();
-  //   timeDIN = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(convertMinute) + ":" + String(convertSecond); 
-  //   messageDIN = timeDIN + ";100;03.00;01;06" + "\n";
-  //   appendFile(SD, fileNameDIN.c_str(), title.c_str());
-  //   appendFile(SD, fileNameDIN.c_str(), messageDIN.c_str());
-  // }
-  // dataMessage = String(result3, 6) + ";" + "\n";
-  //   if (millis()- last_time > programDelay){
-  //   last_time = millis();
-  //   appendFile(SD, fileNameDIN.c_str(), dataMessage.c_str());
-  //   }
+   if (DynamicMode == true){
+  programDelay = 20;
+  digitalWrite(LED_PIN, HIGH);
+  if(lastMinute != now.minute()){
+    fileNameTimeDIN = String(now.hour()) + convertMinute  + convertSecond + "01";
+    fileNameDIN = "/DIN/" + fileNameTimeDIN + ".csv"; 
+    lastMinute = now.minute();
+    timeDIN = String(now.day()) + "." + String(now.month()) + "." + String(now.year()) + ";" + String(now.hour()) + ":" + String(convertMinute) + ":" + String(convertSecond); 
+    messageDIN = timeDIN + ";100;03.00;01;06" + "\n";
+    appendFile(SD, fileNameDIN.c_str(), title.c_str());
+    appendFile(SD, fileNameDIN.c_str(), messageDIN.c_str());
+  }
+  dataMessage = String(result, 6) + ";" + "\n";
+    if (millis()- last_time > programDelay){
+    last_time = millis();
+    appendFile(SD, fileNameDIN.c_str(), dataMessage.c_str());
+    }
  
-  // }
+  }
 
   u8g2.firstPage();
   u8g2.clearBuffer();
